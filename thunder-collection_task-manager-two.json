@@ -1,0 +1,103 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "task-manager-two",
+    "dateExported": "2023-12-14T22:18:17.460Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "f9780cd5-d9a6-4050-87ec-b69236572285",
+            "colId": "e484d28c-8957-4ca1-a822-8c9344e4052a",
+            "containerId": "",
+            "name": "get all task",
+            "url": "http://localhost:8080/tasks/getAll",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-12-14T21:38:56.682Z",
+            "modified": "2023-12-14T21:40:38.995Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "3ea47c36-a3b4-4fd8-8433-b3b8d01b0e94",
+            "colId": "e484d28c-8957-4ca1-a822-8c9344e4052a",
+            "containerId": "",
+            "name": "get task",
+            "url": "http://localhost:8080/tasks/get/1",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-12-14T21:39:00.382Z",
+            "modified": "2023-12-14T22:05:51.813Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "23c43fe5-281b-4b16-8836-e9cc0922dd15",
+            "colId": "e484d28c-8957-4ca1-a822-8c9344e4052a",
+            "containerId": "",
+            "name": "get due tasks",
+            "url": "http://localhost:8080/tasks/dueReminders",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-12-14T22:02:40.396Z",
+            "modified": "2023-12-14T22:02:57.114Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "718e4f3d-f018-4599-99fc-b43ecd29b009",
+            "colId": "e484d28c-8957-4ca1-a822-8c9344e4052a",
+            "containerId": "",
+            "name": "create new task",
+            "url": "http://localhost:8080/tasks/create",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2023-12-14T21:39:03.709Z",
+            "modified": "2023-12-14T22:13:34.889Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"id\": \"2\",\n  \"title\": \"Complete Project 02\",\n  \"description\": \"Finish the project by implementing all required features. 02\",\n  \"priority\": \"Low\",\n  \"dueDateTime\": \"2023-12-31T23:59:59Z\",\n  \"reminders\": [\n    {\"id\": \"r1\", \"date\": \"2023-12-30T12:00:00Z\"},\n    {\"id\": \"r2\", \"date\": \"2023-12-31T10:00:00Z\"}\n  ]\n}\n",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "d40e470e-f4fc-4f18-9b5d-f479439b9838",
+            "colId": "e484d28c-8957-4ca1-a822-8c9344e4052a",
+            "containerId": "",
+            "name": "delete task",
+            "url": "http://localhost:8080/tasks/delete/1",
+            "method": "DELETE",
+            "sortNum": 45000,
+            "created": "2023-12-14T21:39:14.425Z",
+            "modified": "2023-12-14T22:06:09.541Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "bf1d473f-a3cc-4dc9-b0d0-caf98b520fd0",
+            "colId": "e484d28c-8957-4ca1-a822-8c9344e4052a",
+            "containerId": "",
+            "name": "update task",
+            "url": "http://localhost:8080/tasks/update/2",
+            "method": "PUT",
+            "sortNum": 50000,
+            "created": "2023-12-14T21:39:05.981Z",
+            "modified": "2023-12-14T22:18:05.877Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"title\": \"Complete Project\",\n  \"description\": \"Finish the project by implementing all required features. Update: Added more features.\",\n  \"priority\": \"High\",\n  \"dueDateTime\": \"2023-12-14T01:59:59Z\",\n  \"reminders\": [\n    {\"id\": \"r3\", \"date\": \"2023-12-15T01:00:00Z\"}\n  ]\n}\n",
+                "form": []
+            },
+            "tests": []
+        }
+    ]
+}
