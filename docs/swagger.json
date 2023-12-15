@@ -1,12 +1,12 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API for managing tasks and reminders",
-        "title": "Task API",
+        "description": "This background task runs periodically to find and notify due tasks.",
+        "title": "Background Task",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
-            "email": "support@task-api.com"
+            "email": "gowithvikash@gmail.com"
         },
         "version": "1.0"
     },
@@ -308,6 +308,9 @@
                     "type": "string"
                 },
                 "dueDateTime": {
+                    "type": "string"
+                },
+                "email": {
                     "type": "string"
                 },
                 "id": {

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -10,8 +11,11 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/vikash-parashar/task-manager-2/config"
 	"github.com/vikash-parashar/task-manager-2/handlers"
+	"github.com/vikash-parashar/task-manager-2/helpers"
 	"github.com/vikash-parashar/task-manager-2/models"
 )
+
+var done = make(chan bool)
 
 // @title Task API
 // @version 1.0
@@ -33,6 +37,30 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	// PeriodicTask checks for due tasks in the background and sends email notifications.
+	// @title Background Task
+	// @description This background task runs periodically to find and notify due tasks.
+	// @version 1.0
+	// @termsOfService http://swagger.io/terms/
+	// @contact.name API Support
+	// @contact.email gowithvikash@gmail.com
+	// @host localhost:8080
+	// @BasePath /v1
+	go func() {
+		ticker := time.NewTicker(30 * time.Minute) // Adjust the interval as needed
+		defer ticker.Stop()
+
+		for range ticker.C {
+			// Execute the function to find and notify due tasks
+			go func() {
+				err := FindAndNotifyDueTasks()
+				if err != nil {
+					fmt.Println("Error while checking and notifying due tasks:", err)
+				}
+			}()
+		}
+	}()
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -114,7 +142,7 @@ func main() {
 	// @Success 200 {array} Task "Successfully retrieved tasks with due reminders"
 	// @Failure 500 {object} ErrorResponse "Internal server error"
 	// @Router /tasks/dueReminders [get]
-	r.Get("/tasks/dueReminders", handlers.GetTasksWithDueReminder)
+	r.Get("/tasks/dueReminders", handlers.GetTasksWithDueReminderHandler)
 
 	port := 8080
 	fmt.Printf("Server is running on port %d...\n", port)
@@ -123,4 +151,36 @@ func main() {
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
+}
+
+// FindAndNotifyDueTasks checks for tasks that are due based on reminders and sends email notifications
+func FindAndNotifyDueTasks() error {
+	defer func() {
+		done <- true
+	}()
+	currentTime := time.Now()
+
+	// Retrieve tasks with associated reminders
+	rows, err := config.DB.Query("SELECT tasks.id, tasks.title, tasks.description, tasks.priority, tasks.due_date_time, tasks.email, reminders.id, reminders.date FROM tasks LEFT JOIN reminders ON tasks.id = reminders.task_id")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var task models.Task
+		var reminder models.Reminder
+		err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.DueDateTime, &task.Email, &reminder.ID, &reminder.Date)
+		if err != nil {
+			return err
+		}
+
+		// Check if the reminder is due
+		if !reminder.Date.IsZero() && reminder.Date.Before(currentTime) {
+			// Reminder is due
+			helpers.SendEmailNotification(task, "Reminder due")
+		}
+	}
+
+	return nil
 }

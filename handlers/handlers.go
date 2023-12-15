@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/google/uuid"
 	"github.com/vikash-parashar/task-manager-2/controllers"
 	"github.com/vikash-parashar/task-manager-2/models"
 )
@@ -23,12 +25,17 @@ func CreateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var newTask models.Task
 	err := json.NewDecoder(r.Body).Decode(&newTask)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
+	// Generate a new UUID for the task
+	newTask.ID = uuid.New().String()
+
 	err = controllers.CreateTask(newTask)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Error creating task", http.StatusInternalServerError)
 		return
 	}
@@ -54,6 +61,7 @@ func GetTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	task, err := controllers.GetTask(taskID)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Task not found", http.StatusNotFound)
 		return
 	}
@@ -82,12 +90,14 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var updatedTask models.Task
 	err := json.NewDecoder(r.Body).Decode(&updatedTask)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	err = controllers.UpdateTask(taskID, updatedTask)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Error updating task", http.StatusInternalServerError)
 		return
 	}
@@ -113,6 +123,7 @@ func DeleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := controllers.DeleteTask(taskID)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Error deleting task", http.StatusInternalServerError)
 		return
 	}
@@ -130,6 +141,7 @@ func DeleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 func GetAllTasksHandler(w http.ResponseWriter, r *http.Request) {
 	tasks, err := controllers.GetAllTasks()
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Error retrieving tasks", http.StatusInternalServerError)
 		return
 	}
@@ -144,10 +156,12 @@ func GetAllTasksHandler(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} models.Task "Successfully retrieved tasks with due reminders"
 // @Failure 500 {object} string "Internal server error"
 // @Router /tasks/dueReminders [get]
-func GetTasksWithDueReminder(w http.ResponseWriter, r *http.Request) {
+func GetTasksWithDueReminderHandler(w http.ResponseWriter, r *http.Request) {
 	currentTime := time.Now()
 	tasks, err := controllers.GetTasksWithDueReminders(currentTime)
 	if err != nil {
+		log.Println(err)
+		http.Error(w, "Error retrieving tasks with due reminders", http.StatusInternalServerError)
 		return
 	}
 	json.NewEncoder(w).Encode(tasks)

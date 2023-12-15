@@ -12,7 +12,7 @@ const docTemplate = `{
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
-            "email": "support@task-api.com"
+            "email": "gowithvikash@gmail.com"
         },
         "version": "{{.Version}}"
     },
@@ -316,6 +316,9 @@ const docTemplate = `{
                 "dueDateTime": {
                     "type": "string"
                 },
+                "email": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -354,8 +357,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/v1",
 	Schemes:          []string{},
-	Title:            "Task API",
-	Description:      "API for managing tasks and reminders",
+	Title:            "Background Task",
+	Description:      "This background task runs periodically to find and notify due tasks.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

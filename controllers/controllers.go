@@ -17,29 +17,39 @@ import (
 // @Success 200 {string} string "Successfully created task"
 // @Failure 500 {object} string "Internal server error"
 // @Router /tasks/create [post]
+// CreateTask creates a new task in the database
 func CreateTask(task models.Task) error {
 	tx, err := config.DB.Begin()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to begin transaction: %v", err)
 	}
-	defer tx.Rollback()
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
 
 	// Insert task
-	_, err = tx.Exec("INSERT INTO tasks (id, title, description, priority, due_date_time) VALUES ($1, $2, $3, $4, $5)",
-		task.ID, task.Title, task.Description, task.Priority, task.DueDateTime)
+	_, err = tx.Exec("INSERT INTO tasks (id, title, description, priority, due_date_time, email) VALUES ($1, $2, $3, $4, $5, $6)",
+		task.ID, task.Title, task.Description, task.Priority, task.DueDateTime, task.Email)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to insert task: %v", err)
 	}
 
 	// Insert reminders
 	for _, reminder := range task.Reminders {
 		_, err = tx.Exec("INSERT INTO reminders (id, date, task_id) VALUES ($1, $2, $3)", reminder.ID, reminder.Date, task.ID)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to insert reminder: %v", err)
 		}
 	}
 
-	return tx.Commit()
+	return nil
 }
 
 // @Summary Get a task by ID
@@ -54,8 +64,8 @@ func CreateTask(task models.Task) error {
 func GetTask(id string) (models.Task, error) {
 	var task models.Task
 
-	row := config.DB.QueryRow("SELECT id, title, description, priority, due_date_time FROM tasks WHERE id = $1", id)
-	err := row.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.DueDateTime)
+	row := config.DB.QueryRow("SELECT id, title, description, priority, due_date_time , email FROM tasks WHERE id = $1", id)
+	err := row.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.DueDateTime, &task.Email)
 	if err != nil {
 		return models.Task{}, err
 	}
@@ -88,35 +98,45 @@ func GetTask(id string) (models.Task, error) {
 // @Success 200 {string} string "Successfully updated task"
 // @Failure 500 {object} string "Internal server error"
 // @Router /tasks/update/{id} [put]
-func UpdateTask(id string, updatedTask models.Task) error {
+// UpdateTask updates an existing task in the database
+func UpdateTask(id string, task models.Task) error {
 	tx, err := config.DB.Begin()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to begin transaction: %v", err)
 	}
-	defer tx.Rollback()
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
 
 	// Update task
-	_, err = tx.Exec("UPDATE tasks SET title = $1, description = $2, priority = $3, due_date_time = $4 WHERE id = $5",
-		updatedTask.Title, updatedTask.Description, updatedTask.Priority, updatedTask.DueDateTime, id)
+	_, err = tx.Exec("UPDATE tasks SET title = $1, description = $2, priority = $3, due_date_time = $4, email = $5 WHERE id = $6",
+		task.Title, task.Description, task.Priority, task.DueDateTime, task.Email, id)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to update task: %v", err)
 	}
 
 	// Delete existing reminders
 	_, err = tx.Exec("DELETE FROM reminders WHERE task_id = $1", id)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to delete existing reminders: %v", err)
 	}
 
 	// Insert updated reminders
-	for _, reminder := range updatedTask.Reminders {
+	for _, reminder := range task.Reminders {
 		_, err = tx.Exec("INSERT INTO reminders (id, date, task_id) VALUES ($1, $2, $3)", reminder.ID, reminder.Date, id)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to insert updated reminder: %v", err)
 		}
 	}
 
-	return tx.Commit()
+	return nil
 }
 
 // @Summary Delete a task by ID
@@ -127,21 +147,20 @@ func UpdateTask(id string, updatedTask models.Task) error {
 // @Success 200 {string} string "Successfully deleted task"
 // @Failure 500 {object} string "Internal server error"
 // @Router /tasks/delete/{id} [delete]
+// DeleteTask deletes a task from the database by ID
 func DeleteTask(id string) error {
 	tx, err := config.DB.Begin()
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %v", err)
 	}
-
-	// Defer a function to handle transaction finalization
 	defer func() {
 		if p := recover(); p != nil {
-			_ = tx.Rollback() // Ignore error; panicking
-			panic(p)          // Re-panic
+			_ = tx.Rollback()
+			panic(p)
 		} else if err != nil {
-			_ = tx.Rollback() // Ignore error; already set
+			_ = tx.Rollback()
 		} else {
-			err = tx.Commit() // If commit is successful, set the error to nil
+			err = tx.Commit()
 		}
 	}()
 
@@ -170,7 +189,7 @@ func DeleteTask(id string) error {
 func GetAllTasks() ([]models.Task, error) {
 	var tasks []models.Task
 
-	rows, err := config.DB.Query("SELECT id, title, description, priority, due_date_time FROM tasks")
+	rows, err := config.DB.Query("SELECT id, title, description, priority, due_date_time ,email FROM tasks")
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +197,7 @@ func GetAllTasks() ([]models.Task, error) {
 
 	for rows.Next() {
 		var task models.Task
-		err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.DueDateTime)
+		err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.DueDateTime, &task.Email)
 		if err != nil {
 			return nil, err
 		}
@@ -214,7 +233,7 @@ func GetAllTasks() ([]models.Task, error) {
 // @Router /tasks/dueReminders [get]
 func GetTasksWithDueReminders(currentTime time.Time) ([]models.Task, error) {
 
-	rows, err := config.DB.Query("SELECT id, title, description, priority, due_date_time FROM tasks WHERE due_date_time <= $1", currentTime)
+	rows, err := config.DB.Query("SELECT id, title, description, priority, due_date_time,email FROM tasks WHERE due_date_time <= $1", currentTime)
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +243,7 @@ func GetTasksWithDueReminders(currentTime time.Time) ([]models.Task, error) {
 
 	for rows.Next() {
 		var task models.Task
-		err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.DueDateTime)
+		err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.DueDateTime, &task.Email)
 		if err != nil {
 			return nil, err
 		}

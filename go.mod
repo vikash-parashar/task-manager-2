@@ -8,6 +8,8 @@ require (
 	github.com/swaggo/swag v1.16.2
 )
 
+require github.com/google/uuid v1.5.0 // indirect
+
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/go-chi/cors v1.2.1 // indirect

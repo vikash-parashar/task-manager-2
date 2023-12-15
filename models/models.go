@@ -8,24 +8,23 @@ import (
 
 // Task represents a task with its details
 type Task struct {
-	ID          string     `json:"id"`
-	Title       string     `json:"title"`
-	Description string     `json:"description"`
-	Priority    string     `json:"priority"`
-	DueDateTime time.Time  `json:"dueDateTime"`
-	Reminders   []Reminder `json:"reminders"`
-
-	// Notification fields
-	NotifyMethod  string `json:"notifyMethod"`  // e.g., "email", "push"
-	NotifyStatus  string `json:"notifyStatus"`  // e.g., "pending", "sent", "failed"
-	NotifyMessage string `json:"notifyMessage"` // Additional information about the notification
+	ID            string     `json:"id"`
+	Title         string     `json:"title"`
+	Description   string     `json:"description"`
+	Priority      string     `json:"priority"`
+	DueDateTime   time.Time  `json:"dueDateTime"`
+	Email         string     `json:"email"`
+	NotifyMethod  string     `json:"notifyMethod"`
+	NotifyStatus  string     `json:"notifyStatus"`
+	NotifyMessage string     `json:"notifyMessage"`
+	Reminders     []Reminder `json:"reminders"`
 }
 
 // Reminder represents a reminder associated with a task
 type Reminder struct {
-	ID     string `json:"id"`
-	Date   string `json:"date"`
-	TaskID string `json:"taskID"`
+	ID     string    `json:"id"`
+	Date   time.Time `json:"date"`
+	TaskID string    `json:"taskID"`
 }
 
 // @Summary Create tables
@@ -38,11 +37,15 @@ func CreateTables(db *sql.DB) error {
 	// Create Task table
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS tasks (
-			id VARCHAR(36) PRIMARY KEY,
+			id VARCHAR(255) PRIMARY KEY,
 			title VARCHAR(255),
 			description VARCHAR(255),
 			priority VARCHAR(50),
-			due_date_time TIMESTAMP
+			due_date_time TIMESTAMP,
+			email VARCHAR(255),
+			notify_method VARCHAR(50),
+			notify_status VARCHAR(50),
+			notify_message VARCHAR(255)
 		)
 	`)
 	if err != nil {
@@ -52,9 +55,9 @@ func CreateTables(db *sql.DB) error {
 	// Create Reminder table
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS reminders (
-			id VARCHAR(36) PRIMARY KEY,
-			date VARCHAR(20),
-			task_id VARCHAR(36) REFERENCES tasks(id)
+			id VARCHAR(255) PRIMARY KEY,
+			date TIMESTAMP,
+			task_id VARCHAR(255) REFERENCES tasks(id)
 		)
 	`)
 	if err != nil {

@@ -15,6 +15,8 @@ definitions:
         type: string
       dueDateTime:
         type: string
+      email:
+        type: string
       id:
         type: string
       notifyMessage:
@@ -38,11 +40,11 @@ definitions:
 host: localhost:8080
 info:
   contact:
-    email: support@task-api.com
+    email: gowithvikash@gmail.com
     name: API Support
-  description: API for managing tasks and reminders
+  description: This background task runs periodically to find and notify due tasks.
   termsOfService: http://swagger.io/terms/
-  title: Task API
+  title: Background Task
   version: "1.0"
 paths:
   /createTables:
