@@ -18,3 +18,12 @@
 ![Testing Api](image-2.png)
 ![postgres DB for reminder](image-3.png)
 ![postgres DB for task](image-4.png)
+![Swagger Api Documentation](image-5.png)
+
+# to access the swagger api documentation
+
+1. run the application
+
+then use tools like wget or curl to download the Swagger JSON file from server.
+
+or paste this link to web browser : http://localhost:8080/swagger/
