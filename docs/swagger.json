@@ -1,0 +1,343 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API for managing tasks and reminders",
+        "title": "Task API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "email": "support@task-api.com"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/v1",
+    "paths": {
+        "/createTables": {
+            "post": {
+                "description": "Creates the Task and Reminder tables in the database",
+                "summary": "Create tables",
+                "operationId": "create-tables",
+                "responses": {
+                    "200": {
+                        "description": "Tables created successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/init": {
+            "get": {
+                "description": "Establishes a connection to the PostgreSQL database",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Initialize the database connection",
+                "operationId": "init-db",
+                "responses": {
+                    "200": {
+                        "description": "Successfully connected to the database",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/create": {
+            "post": {
+                "description": "Creates a new task with the specified details",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create a new task",
+                "operationId": "create-task",
+                "parameters": [
+                    {
+                        "description": "models.Task details",
+                        "name": "task",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Task"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully created task",
+                        "schema": {
+                            "$ref": "#/definitions/models.Task"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/delete/{id}": {
+            "delete": {
+                "description": "Deletes a task by its unique identifier",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete a task by ID",
+                "operationId": "delete-task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "models.Task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted task",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "models.Task not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/dueReminders": {
+            "get": {
+                "description": "Retrieves a list of tasks with due reminders",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get tasks with due reminders",
+                "operationId": "get-tasks-with-due-reminders",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved tasks with due reminders",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Task"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/get/{id}": {
+            "get": {
+                "description": "Retrieves a task by its unique identifier",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a task by ID",
+                "operationId": "get-task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "models.Task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved task",
+                        "schema": {
+                            "$ref": "#/definitions/models.Task"
+                        }
+                    },
+                    "404": {
+                        "description": "models.Task not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/getAll": {
+            "get": {
+                "description": "Retrieves a list of all tasks",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all tasks",
+                "operationId": "get-all-tasks",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved tasks",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Task"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/update/{id}": {
+            "put": {
+                "description": "Updates a task with the specified details",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update a task by ID",
+                "operationId": "update-task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "models.Task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated task details",
+                        "name": "task",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Task"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated task",
+                        "schema": {
+                            "$ref": "#/definitions/models.Task"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "models.Task not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Reminder": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "taskID": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Task": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "dueDateTime": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "notifyMessage": {
+                    "description": "Additional information about the notification",
+                    "type": "string"
+                },
+                "notifyMethod": {
+                    "description": "Notification fields",
+                    "type": "string"
+                },
+                "notifyStatus": {
+                    "description": "e.g., \"pending\", \"sent\", \"failed\"",
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "string"
+                },
+                "reminders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Reminder"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

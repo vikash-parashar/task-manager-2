@@ -1,0 +1,229 @@
+basePath: /v1
+definitions:
+  models.Reminder:
+    properties:
+      date:
+        type: string
+      id:
+        type: string
+      taskID:
+        type: string
+    type: object
+  models.Task:
+    properties:
+      description:
+        type: string
+      dueDateTime:
+        type: string
+      id:
+        type: string
+      notifyMessage:
+        description: Additional information about the notification
+        type: string
+      notifyMethod:
+        description: Notification fields
+        type: string
+      notifyStatus:
+        description: e.g., "pending", "sent", "failed"
+        type: string
+      priority:
+        type: string
+      reminders:
+        items:
+          $ref: '#/definitions/models.Reminder'
+        type: array
+      title:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@task-api.com
+    name: API Support
+  description: API for managing tasks and reminders
+  termsOfService: http://swagger.io/terms/
+  title: Task API
+  version: "1.0"
+paths:
+  /createTables:
+    post:
+      description: Creates the Task and Reminder tables in the database
+      operationId: create-tables
+      responses:
+        "200":
+          description: Tables created successfully
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create tables
+  /init:
+    get:
+      description: Establishes a connection to the PostgreSQL database
+      operationId: init-db
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully connected to the database
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Initialize the database connection
+  /tasks/create:
+    post:
+      description: Creates a new task with the specified details
+      operationId: create-task
+      parameters:
+      - description: models.Task details
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/models.Task'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created task
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create a new task
+  /tasks/delete/{id}:
+    delete:
+      description: Deletes a task by its unique identifier
+      operationId: delete-task
+      parameters:
+      - description: models.Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted task
+          schema:
+            type: string
+        "404":
+          description: models.Task not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete a task by ID
+  /tasks/dueReminders:
+    get:
+      description: Retrieves a list of tasks with due reminders
+      operationId: get-tasks-with-due-reminders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved tasks with due reminders
+          schema:
+            items:
+              $ref: '#/definitions/models.Task'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get tasks with due reminders
+  /tasks/get/{id}:
+    get:
+      description: Retrieves a task by its unique identifier
+      operationId: get-task
+      parameters:
+      - description: models.Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved task
+          schema:
+            $ref: '#/definitions/models.Task'
+        "404":
+          description: models.Task not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get a task by ID
+  /tasks/getAll:
+    get:
+      description: Retrieves a list of all tasks
+      operationId: get-all-tasks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved tasks
+          schema:
+            items:
+              $ref: '#/definitions/models.Task'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get all tasks
+  /tasks/update/{id}:
+    put:
+      description: Updates a task with the specified details
+      operationId: update-task
+      parameters:
+      - description: models.Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated task details
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/models.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated task
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "404":
+          description: models.Task not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update a task by ID
+swagger: "2.0"

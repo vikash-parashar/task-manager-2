@@ -9,6 +9,7 @@ import (
 	"github.com/vikash-parashar/task-manager-2/models"
 )
 
+// CheckReminders periodically checks for tasks with due reminders and sends notifications.
 func CheckReminders() {
 	for {
 		// Get current time
@@ -30,7 +31,7 @@ func CheckReminders() {
 	}
 }
 
-// sendNotification checks the notification method and sends the notification
+// sendNotification checks the notification method and sends the notification.
 func sendNotification(task models.Task) {
 	switch task.NotifyMethod {
 	case "email":
@@ -42,16 +43,14 @@ func sendNotification(task models.Task) {
 	}
 }
 
-// sendEmailNotification sends an email notification for the task
+// sendEmailNotification sends an email notification for the task.
 func sendEmailNotification(task models.Task) {
-	//TODO:
-	//FIXME:
+	//TODO: Implement email notification logic
 	fmt.Printf("Sending email notification for task %s\n", task.ID)
 }
 
-// sendPushNotification sends a push notification for the task
+// sendPushNotification sends a push notification for the task.
 func sendPushNotification(task models.Task) {
-	//TODO:
-	//FIXME:
+	//TODO: Implement push notification logic
 	fmt.Printf("Sending push notification for task %s\n", task.ID)
 }

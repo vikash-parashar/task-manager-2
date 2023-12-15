@@ -28,7 +28,12 @@ type Reminder struct {
 	TaskID string `json:"taskID"`
 }
 
-// CreateTables creates the Task and Reminder tables in the database
+// @Summary Create tables
+// @Description Creates the Task and Reminder tables in the database
+// @ID create-tables
+// @Success 200 {string} string "Tables created successfully"
+// @Failure 500 {object} string "Internal server error"
+// @Router /createTables [post]
 func CreateTables(db *sql.DB) error {
 	// Create Task table
 	_, err := db.Exec(`

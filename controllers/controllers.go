@@ -8,7 +8,15 @@ import (
 	"github.com/vikash-parashar/task-manager-2/models"
 )
 
-// CreateTask adds a new task to the database
+// @Summary Create a new task
+// @Description Adds a new task to the database
+// @ID create-task
+// @Accept json
+// @Produce json
+// @Param task body models.Task true "Task details"
+// @Success 200 {string} string "Successfully created task"
+// @Failure 500 {object} string "Internal server error"
+// @Router /tasks/create [post]
 func CreateTask(task models.Task) error {
 	tx, err := config.DB.Begin()
 	if err != nil {
@@ -34,7 +42,15 @@ func CreateTask(task models.Task) error {
 	return tx.Commit()
 }
 
-// GetTask retrieves a task from the database by ID
+// @Summary Get a task by ID
+// @Description Retrieves a task from the database by ID
+// @ID get-task
+// @Produce json
+// @Param id path string true "Task ID"
+// @Success 200 {object} models.Task "Successfully retrieved task"
+// @Failure 404 {object} string "Task not found"
+// @Failure 500 {object} string "Internal server error"
+// @Router /tasks/get/{id} [get]
 func GetTask(id string) (models.Task, error) {
 	var task models.Task
 
@@ -62,7 +78,16 @@ func GetTask(id string) (models.Task, error) {
 	return task, nil
 }
 
-// UpdateTask updates an existing task in the database
+// @Summary Update a task by ID
+// @Description Updates an existing task in the database
+// @ID update-task
+// @Accept json
+// @Produce json
+// @Param id path string true "Task ID"
+// @Param task body models.Task true "Updated task details"
+// @Success 200 {string} string "Successfully updated task"
+// @Failure 500 {object} string "Internal server error"
+// @Router /tasks/update/{id} [put]
 func UpdateTask(id string, updatedTask models.Task) error {
 	tx, err := config.DB.Begin()
 	if err != nil {
@@ -94,30 +119,14 @@ func UpdateTask(id string, updatedTask models.Task) error {
 	return tx.Commit()
 }
 
-// DeleteTask removes a task from the database by ID
-// func DeleteTask(id string) error {
-// 	tx, err := config.DB.Begin()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer tx.Rollback()
-
-// 	// Delete task
-// 	_, err = tx.Exec("DELETE FROM tasks WHERE id = $1", id)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	// Delete associated reminders
-// 	_, err = tx.Exec("DELETE FROM reminders WHERE task_id = $1", id)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return tx.Commit()
-// }
-
-// DeleteTask removes a task from the database by ID
+// @Summary Delete a task by ID
+// @Description Removes a task from the database by ID
+// @ID delete-task
+// @Produce json
+// @Param id path string true "Task ID"
+// @Success 200 {string} string "Successfully deleted task"
+// @Failure 500 {object} string "Internal server error"
+// @Router /tasks/delete/{id} [delete]
 func DeleteTask(id string) error {
 	tx, err := config.DB.Begin()
 	if err != nil {
@@ -151,7 +160,13 @@ func DeleteTask(id string) error {
 	return nil
 }
 
-// GetAllTasks retrieves all tasks from the database
+// @Summary Get all tasks
+// @Description Retrieves a list of all tasks from the database
+// @ID get-all-tasks
+// @Produce json
+// @Success 200 {array} models.Task "Successfully retrieved tasks"
+// @Failure 500 {object} string "Internal server error"
+// @Router /tasks/getAll [get]
 func GetAllTasks() ([]models.Task, error) {
 	var tasks []models.Task
 
@@ -189,7 +204,14 @@ func GetAllTasks() ([]models.Task, error) {
 	return tasks, nil
 }
 
-// GetTasksWithDueReminders queries tasks with due reminders from the database
+// @Summary Get tasks with due reminders
+// @Description Retrieves a list of tasks with due reminders from the database
+// @ID get-tasks-with-due-reminders
+// @Produce json
+// @Param currentTime query string true "Current time in RFC3339 format"
+// @Success 200 {array} models.Task "Successfully retrieved tasks with due reminders"
+// @Failure 500 {object} string "Internal server error"
+// @Router /tasks/dueReminders [get]
 func GetTasksWithDueReminders(currentTime time.Time) ([]models.Task, error) {
 
 	rows, err := config.DB.Query("SELECT id, title, description, priority, due_date_time FROM tasks WHERE due_date_time <= $1", currentTime)

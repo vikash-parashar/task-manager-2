@@ -3,9 +3,11 @@ package config
 import (
 	"database/sql"
 	"fmt"
+
+	_ "github.com/lib/pq"
 )
 
-// my local postgres db credentials , please do change if needed
+// my local postgres db credentials, please do change if needed
 const (
 	host     = "localhost"
 	port     = 5432
@@ -16,6 +18,13 @@ const (
 
 var DB *sql.DB
 
+// @Summary Initialize the database connection
+// @Description Establishes a connection to the PostgreSQL database
+// @ID init-db
+// @Produce json
+// @Success 200 {string} string "Successfully connected to the database"
+// @Failure 500 {object} string "Internal server error"
+// @Router /init [get]
 func InitDB() error {
 	var err error
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
